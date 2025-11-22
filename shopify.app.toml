@@ -1,0 +1,21 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "738444e7141498b22ddb2345db0c1ec0"
+name = "SALES POPUP"
+#application_url = "https://example.com"
+application_url = "https://header-remark-joining-arch.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-01"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,read_inventory"
+
+[auth]
+#redirect_urls = [ "https://example.com/api/auth/callback" ]
+redirect_urls = [ "https://header-remark-joining-arch.trycloudflare.com/api/auth/callback" ]

@@ -1,0 +1,230 @@
+<div class="countdown-timer-wrapper" 
+     id="countdown-timer-{{ block.id }}" 
+     data-block-id="{{ block.id }}" 
+     data-timer-id="{{ block.settings.timerId }}">
+  
+  <!-- Timer will be dynamically loaded here by JavaScript -->
+  <div id="countdown-timer-loading-{{ block.id }}" class="countdown-timer-loading">
+    {% if block.settings.timerId %}
+      <div class="timer-loading-text">Loading timer...</div>
+    {% else %}
+      <div class="no-timer-loading-text">Please configure TimerID in section settings</div>
+    {% endif %}
+  </div>
+  
+  <!-- Main Timer Container (hidden initially) -->
+  <div class="countdown-timer-container" id="timer-container-{{ block.id }}" style="display: none;">
+    <!-- Title Section -->
+    <div class="countdown-timer-title" id="timer-title-{{ block.id }}"></div>
+    
+    <!-- Subheading Section -->
+    <div class="countdown-timer-subheading" id="timer-subheading-{{ block.id }}"></div>
+    
+    <!-- Timer Numbers Row -->
+    <div class="countdown-timer-numbers" id="countdown-timer-numbers-{{ block.id }}">
+      {% assign ids = "days,hours,minutes,seconds" | split: "," %}
+      {% for id in ids %}
+        <div class="countdown-time-unit">
+          <span id="timer-cd-{{ id }}-{{ block.id }}" class="timer-number">00</span>
+          {% if forloop.index < 4 %}
+            <span class="timer-colon">:</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Timer Labels Row -->
+    <div class="countdown-timer-labels" id="countdown-timer-labels-{{ block.id }}">
+      {% assign ids = "days,hours,minutes,seconds" | split: "," %}
+      {% for id in ids %}
+        <div class="timer-label-container">
+          <span class="timer-label" id="timer-label-{{ id }}-{{ block.id }}"></span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  
+  <!-- Custom End Message -->
+  <div class="countdown-timer-end-message" id="timer-end-message-{{ block.id }}" style="display: none;"></div>
+</div>
+
+<style>
+  .countdown-timer-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+
+  .countdown-timer-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 100px;
+  }
+
+  .timer-loading-text {
+    color: #666;
+    font-size: 16px;
+    font-style: italic;
+  }
+
+  .no-timer-loading-text {
+    color: #ff6b6b;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .countdown-timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 24px;
+    background-color: #ffffff;
+    border: 2px solid #333333;
+    border-radius: 12px;
+    margin: 0px 0;
+    min-width: 100%;
+  }
+
+  .countdown-timer-title {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    margin: 2px;
+    color: #202223;
+    line-height: 1.2;
+  }
+
+  .countdown-timer-subheading {
+    font-size: 16px;
+    text-align: center;
+    margin: -8px 0 0 0;
+    color: #202223;
+    line-height: 1.2;
+  }
+
+  .countdown-timer-numbers {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .countdown-time-unit {
+    display: flex;
+    align-items: baseline;
+  }
+
+  .timer-number {
+    font-size: 40px;
+    font-weight: bold;
+    color: #202223;
+    line-height: 1;
+  }
+
+  .timer-colon {
+    font-size: 40px;
+    font-weight: bold;
+    color: #202223;
+    margin-left: 4px;
+    line-height: 1;
+  }
+
+  .countdown-timer-labels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 0px;
+  }
+
+  .timer-label-container {
+    text-align: center;
+    min-width: 60px;
+  }
+
+  .timer-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #202223;
+    text-align: center;
+  }
+
+  .countdown-timer-end-message {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 16px;
+    color: #333333;
+    display: none;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .countdown-timer-container {
+      min-width: 300px;
+      padding: 16px;
+      gap: 12px;
+    }
+    
+    .timer-number {
+      font-size: 32px;
+    }
+    
+    .timer-colon {
+      font-size: 32px;
+    }
+    
+    .countdown-timer-title {
+      font-size: 24px;
+    }
+    
+    .countdown-timer-subheading {
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .countdown-timer-container {
+      min-width: 280px;
+      padding: 12px;
+      gap: 8px;
+    }
+    
+    .timer-number {
+      font-size: 28px;
+    }
+    
+    .timer-colon {
+      font-size: 28px;
+    }
+    
+    .timer-label {
+      font-size: 12px;
+    }
+  }
+</style>
+
+<script src="{{ 'countdown_timer.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Countdown Timer",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "timerId",
+      "label": "Timer ID",
+      "info": "Enter the Timer ID from countdown_timers database table to fetch timer configuration"
+    }
+  ]
+}
+{% endschema %}

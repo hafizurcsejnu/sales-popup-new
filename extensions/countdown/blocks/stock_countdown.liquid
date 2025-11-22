@@ -1,0 +1,182 @@
+<div class="stock-countdown-wrapper" 
+     id="stock-countdown-{{ block.id }}" 
+     {{ block.shopify_attributes }}
+     data-block-id="{{ block.id }}" 
+     data-stock-id="{{ block.settings.stockId }}"
+     data-product-handle="{{ product.handle }}"
+     data-shop-domain="{{ shop.permanent_domain }}">
+  
+  <!-- Stock countdown will be dynamically loaded here by JavaScript -->
+  <div id="stock-loading-{{ block.id }}" class="stock-loading">
+    {% if block.settings.stockId %}
+      <div class="stock-loading-text">Loading stock countdown...</div>
+    {% else %}
+      <div class="stock-no-config-text">Please configure Stock ID in section settings</div>
+    {% endif %}
+  </div>
+  
+  <!-- Main Stock Countdown Container (hidden initially) -->
+  <div class="stock-countdown-container" id="stock-container-{{ block.id }}" style="display: none;">
+    <!-- Stock Message -->
+    <div class="stock-stock-message" id="stock-message-{{ block.id }}"></div>
+    
+    <!-- Progress Bar Container -->
+    <div class="stock-progress-container" id="stock-progress-{{ block.id }}" style="display: none;">
+      <div class="stock-progress-bar" id="stock-progress-bar-{{ block.id }}">
+        <div class="stock-progress-fill" id="stock-progress-fill-{{ block.id }}"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Variants List with placeholder for stock messages -->
+  <div class="product-variants" id="stock-variants-{{ block.id }}" style="display: none;">
+    {% for variant in product.variants %}
+      <div class="variant-row" data-variant-id="{{ variant.id }}" style="display:none; margin-bottom:10px;">
+        <span class="variant-title">{{ variant.title }}</span>
+        <span class="stock-msg" style="margin-left: 12px; font-weight: bold; color: #d62828;"></span>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .stock-countdown-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+
+  .stock-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 60px;
+  }
+
+  .stock-loading-text {
+    color: #666;
+    font-size: 16px;
+    font-style: italic;
+  }
+
+  .stock-no-config-text {
+    color: #ff6b6b;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .stock-countdown-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background-color: #ffffff;
+    border: 2px solid #333333;
+    border-radius: 12px;
+    margin: 0px 0;
+    min-width: 100%;
+  }
+
+  .stock-stock-message {
+    font-size: 16px;
+    text-align: center;
+    margin: 0;
+    color: #202223;
+    font-weight: normal;
+    line-height: 1.4;
+  }
+
+  .stock-progress-container {
+    /* All styling will be applied by JavaScript */
+  }
+
+  .stock-progress-bar {
+    /* All styling will be applied by JavaScript */
+  }
+
+  .stock-progress-fill {
+    /* All styling will be applied by JavaScript */
+  }
+
+  .product-variants {
+    margin-top: 16px;
+  }
+
+  .variant-row {
+    display: none;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .variant-row.active {
+    background-color: #f0f8ff;
+  }
+
+  .variant-title {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .stock-msg {
+    margin-left: 12px;
+    font-weight: bold;
+    color: #d62828;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .stock-countdown-container {
+      min-width: 300px;
+      padding: 16px;
+      gap: 12px;
+    }
+    
+    .stock-stock-message {
+      font-size: 14px;
+    }
+    
+    .stock-progress-bar {
+      height: 6px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stock-countdown-container {
+      min-width: 280px;
+      padding: 12px;
+      gap: 8px;
+    }
+    
+    .stock-stock-message {
+      font-size: 13px;
+    }
+    
+    .stock-progress-bar {
+      height: 5px;
+    }
+  }
+</style>
+
+<script src="{{ 'stock_countdown.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Stock Countdown",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "stockId",
+      "label": "Stock ID",
+      "info": "Enter the stock ID from stock_countdowns database table to fetch stock countdown configuration"
+    }
+  ]
+}
+{% endschema %}
