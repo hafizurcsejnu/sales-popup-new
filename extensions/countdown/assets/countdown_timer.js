@@ -1,7 +1,7 @@
 console.log("🚀 Countdown Timer Script is running");
 
 // ⚠️ UPDATE THIS URL when you run 'shopify app dev' and get a new tunnel URL
-const HOST_API_URL = 'https://header-remark-joining-arch.trycloudflare.com/api';
+const HOST_API_URL = 'https://qualify-each-compute-establishment.trycloudflare.com/api';
 console.log("🌐 Using API URL:", HOST_API_URL);
 
 document.addEventListener("DOMContentLoaded", () => {

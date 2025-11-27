@@ -13,6 +13,7 @@ use Shopify\Auth\OAuth;
 use Shopify\Auth\Session as AuthSession;
 use Shopify\Clients\HttpHeaders;
 use Shopify\Clients\Rest;
+use Shopify\Clients\Graphql;
 use Shopify\Context;
 use Shopify\Exception\InvalidWebhookException;
 use Shopify\Utils;
@@ -112,10 +113,54 @@ Route::get('/api/products/count', function (Request $request) {
     /** @var AuthSession */
     $session = $request->get('shopifySession'); // Provided by the shopify.auth middleware, guaranteed to be active
 
-    $client = new Rest($session->getShop(), $session->getAccessToken());
-    $result = $client->get('products/count');
+    $client = new Graphql($session->getShop(), $session->getAccessToken());
+    
+    // GraphQL query to get product count
+    // Note: Shopify GraphQL doesn't provide a direct count field,
+    // so we query products and count them with pagination
+    $count = 0;
+    $cursor = null;
+    $hasNextPage = true;
+    
+    while ($hasNextPage) {
+        $query = <<<'QUERY'
+        query getProductsCount($cursor: String) {
+          products(first: 250, after: $cursor) {
+            edges {
+              node {
+                id
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+        QUERY;
 
-    return response($result->getDecodedBody());
+        $variables = $cursor ? ['cursor' => $cursor] : [];
+        $response = $client->query([
+            'query' => $query,
+            'variables' => $variables
+        ]);
+        
+        $body = $response->getDecodedBody();
+        
+        if (isset($body['errors'])) {
+            Log::error('GraphQL error fetching product count: ' . json_encode($body['errors']));
+            return response()->json(['count' => 0, 'error' => $body['errors']], 500);
+        }
+        
+        $products = $body['data']['products']['edges'] ?? [];
+        $count += count($products);
+        
+        $pageInfo = $body['data']['products']['pageInfo'] ?? [];
+        $hasNextPage = $pageInfo['hasNextPage'] ?? false;
+        $cursor = $pageInfo['endCursor'] ?? null;
+    }
+    
+    return response()->json(['count' => $count]);
 })->middleware('shopify.auth');
 
 Route::post('/api/products', function (Request $request) {
